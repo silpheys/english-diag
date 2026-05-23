@@ -246,7 +246,7 @@ function skipAudio(slideNum, fieldId) {
 // НАВИГАЦИЯ
 // ═══════════════════════════════════════
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyLDOVSjGTpi2dM64sRkOj-jYaOh32F1xb6b1G4owIU3swWpXJrD5HHazz4qto851_6/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwTxXqrqnrwBv7kYEVIJi3lYH1wkoSEj1UHzV7YAGj_LEoyU_JfP1_7NqsVhAONPfnm/exec";
 
 const TOTAL_STEPS = 29;
 let currentStep = 1;
@@ -325,34 +325,19 @@ function answerEng(btn, slideNum, isCorrect) {
     engScore = Math.max(0, engScore - 1);
   }
 
-  // Снимаем старую подсветку со всех кнопок
+  // Снимаем выделение со всех кнопок
   grid.querySelectorAll('.opt').forEach(b => {
     b.classList.remove('selected', 'correct', 'wrong');
-    // НЕ блокируем — оставляем возможность изменить ответ
   });
 
-  // Подсвечиваем выбранный
+  // Просто выделяем выбранный вариант — без подсветки правильного
+  btn.classList.add('selected');
+
   if (isCorrect) {
-    btn.classList.add('selected', 'correct');
     engScore++;
     engAnswered[slideNum] = true;
   } else {
-    btn.classList.add('selected', 'wrong');
-    // Подсвечиваем правильный вариант
-    grid.querySelectorAll('.opt').forEach(b => {
-      const oc = b.getAttribute('onclick') || '';
-      if (oc.includes(', true)') || oc.includes(',true)')) {
-        b.classList.add('correct');
-      }
-    });
     engAnswered[slideNum] = false;
-  }
-
-  // Убираем текстовую подпись — только цветовая подсветка
-  const note = document.getElementById('eng-note-' + slideNum);
-  if (note) {
-    note.textContent = '';
-    note.className = 'eng-feedback';
   }
 
   // Разблокируем «Далее»
