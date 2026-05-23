@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morrison Code Academy — Тест по английскому и ИИ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Geologica:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .btn-skip-audio {
+      display: block;
+      margin: 0 auto 8px;
+      background: none;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 100px;
+      padding: 8px 20px;
+      font-size: 12px;
+      color: #94a3b8;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s;
+    }
+    .btn-skip-audio:hover { border-color: #64748b; color: #374151; }
+
+    .eng-feedback {
+      font-size: 13px;
+      margin-top: 10px;
+      min-height: 18px;
+      font-weight: 500;
+    }
+    .eng-feedback.correct { color: #16a34a; }
+    .eng-feedback.wrong   { color: #dc2626; }
+
+    .opt.correct { border-color: #16a34a !important; background: #f0fdf4 !important; }
+    .opt.wrong   { border-color: #dc2626 !important; background: #fef2f2 !important; }
+
+    .eng-reading-text {
+      background: var(--white);
+      border: 1.5px solid var(--gray2);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .eng-img-placeholder {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .eng-video-wrap {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+    }
+    .eng-video-wrap iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     HERO
+═══════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-glow"></div>
+  <div class="badge"><span></span> Бесплатная диагностика за 5 минут</div>
+  <h1>Английский и ИИ:<br>какой уровень у <em>вашего</em><br>ребёнка?</h1>
+  <p class="hero-sub">Пройдите короткий тест — и мы пришлём персональную диагностику уровня английского и знакомства с ИИ-инструментами</p>
+  <button class="btn-start" onclick="startQuiz()">Пройти тест →</button>
+</section>
+
+<!-- ═══════════════════════════════════════
+     QUIZ SHELL
+═══════════════════════════════════════ -->
+<div class="quiz-wrap" id="quizWrap">
+
+  <div class="quiz-header">
+    <div class="quiz-logo">Morrison Code</div>
+    <div class="quiz-progress-wrap">
+      <div class="quiz-progress-track">
+        <div class="quiz-progress-fill" id="progressFill"></div>
+      </div>
+      <div class="quiz-step-label" id="stepLabel">1 из 29</div>
+    </div>
+    <div style="width:80px;"></div>
+  </div>
+
+  <div class="quiz-body">
+
+    <!-- ───────────────────────────────────
+         БЛОК 1 — О РЕБЁНКЕ (слайды 1–3)
+    ─────────────────────────────────── -->
+
+    <!-- Слайд 1: Имя -->
+    <div class="quiz-slide active" id="slide-1">
+      <div class="quiz-q-num">О ребёнке · 1 из 3</div>
+      <div class="quiz-q">Как зовут вашего ребёнка?</div>
+      <div class="quiz-q-sub">Чтобы диагностика была персональной</div>
+      <input class="input-field" id="childName" type="text" placeholder="Например, Аян"
+        oninput="document.getElementById('next1').disabled = !this.value.trim()" />
+      <div class="nav-row">
+        <button class="btn-next" id="next1" onclick="goNext(1)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 2: Возраст -->
+    <div class="quiz-slide" id="slide-2">
+      <div class="quiz-q-num">О ребёнке · 2 из 3</div>
+      <div class="quiz-q">Сколько лет ребёнку?</div>
+      <div class="range-wrap">
+        <div class="range-display" id="ageDisplay">10 лет</div>
+        <input type="range" min="6" max="17" value="10" id="ageRange"
+          oninput="document.getElementById('ageDisplay').textContent=this.value+' лет'" />
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(2)">← Назад</button>
+        <button class="btn-next" onclick="goNext(2)">Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 3: Класс -->
+    <div class="quiz-slide" id="slide-3">
+      <div class="quiz-q-num">О ребёнке · 3 из 3</div>
+      <div class="quiz-q">В каком классе учится ребёнок?</div>
+      <div class="quiz-q-sub">Необязательно — помогает учесть нагрузку</div>
+      <input class="input-field" id="childClass" type="text" placeholder="Например, 5 класс" />
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(3)">← Назад</button>
+        <button class="btn-next" onclick="goNext(3)">Далее →</button>
+      </div>
+    </div>
+
+    <!-- ───────────────────────────────────
+         БЛОК 2 — ИИ ИНСТРУМЕНТЫ (слайды 4–6)
+    ─────────────────────────────────── -->
+
+    <!-- Слайд 4: Слышал ли об ИИ -->
+    <div class="quiz-slide" id="slide-4">
+      <div class="quiz-q-num">Искусственный интеллект · 1 из 3</div>
+      <div class="quiz-q">Слышал ли ребёнок про ChatGPT, Gemini или другие ИИ?</div>
+      <div class="quiz-q-sub">Умение работать с ИИ — ключевой навык будущего</div>
+      <div class="options-grid" id="opts-ai-awareness">
+        <button class="opt" onclick="selectOpt(this,'opts-ai-awareness');autoNext(4)">
+          <span class="opt-icon">🤩</span>
+          <div class="opt-text"><strong>Да, хорошо знает</strong><span>Может объяснить, что это такое</span></div>
+        </button>
+        <button class="opt" onclick="selectOpt(this,'opts-ai-awareness');autoNext(4)">
+          <span class="opt-icon">🙂</span>
+          <div class="opt-text"><strong>Слышал, но смутно</strong><span>Знает слово, но не очень понимает</span></div>
+        </button>
+        <button class="opt" onclick="selectOpt(this,'opts-ai-awareness');autoNext(4)">
+          <span class="opt-icon">🤷</span>
+          <div class="opt-text"><strong>Не слышал</strong><span>Это ему пока незнакомо</span></div>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(4)">← Назад</button>
+        <button class="btn-next" id="next4" onclick="goNext(4)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 5: Пробовал ли использовать -->
+    <div class="quiz-slide" id="slide-5">
+      <div class="quiz-q-num">Искусственный интеллект · 2 из 3</div>
+      <div class="quiz-q">Пробовал ли ребёнок сам использовать ИИ-инструменты?</div>
+      <div class="options-grid" id="opts-ai-usage">
+        <button class="opt" onclick="selectOpt(this,'opts-ai-usage');autoNext(5)">
+          <span class="opt-icon">✅</span>
+          <div class="opt-text"><strong>Да, пользуется регулярно</strong><span>Сам находит применение</span></div>
+        </button>
+        <button class="opt" onclick="selectOpt(this,'opts-ai-usage');autoNext(5)">
+          <span class="opt-icon">🔍</span>
+          <div class="opt-text"><strong>Пробовал пару раз</strong><span>Из любопытства</span></div>
+        </button>
+        <button class="opt" onclick="selectOpt(this,'opts-ai-usage');autoNext(5)">
+          <span class="opt-icon">👀</span>
+          <div class="opt-text"><strong>Видел, как пользуются другие</strong><span>Сам не пробовал</span></div>
+        </button>
+        <button class="opt" onclick="selectOpt(this,'opts-ai-usage');autoNext(5)">
+          <span class="opt-icon">❌</span>
+          <div class="opt-text"><strong>Нет, никогда не использовал</strong></div>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(5)">← Назад</button>
+        <button class="btn-next" id="next5" onclick="goNext(5)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 6: Для чего использует (multi) -->
+    <div class="quiz-slide" id="slide-6">
+      <div class="quiz-q-num">Искусственный интеллект · 3 из 3</div>
+      <div class="quiz-q">Для чего ребёнок использует или хотел бы использовать ИИ?</div>
+      <div class="quiz-q-sub multi-hint">Можно выбрать несколько</div>
+      <div class="options-grid" id="opts-ai-purpose">
+        <button class="opt multi" onclick="toggleOpt(this,'opts-ai-purpose');syncNext('opts-ai-purpose','next6')">
+          <span class="opt-icon">📝</span>
+          <div class="opt-text"><strong>Помощь с учёбой</strong><span>Объяснения, домашние задания</span></div>
+        </button>
+        <button class="opt multi" onclick="toggleOpt(this,'opts-ai-purpose');syncNext('opts-ai-purpose','next6')">
+          <span class="opt-icon">🎮</span>
+          <div class="opt-text"><strong>Идеи для игр или творчества</strong><span>Придумать сюжет, персонажей</span></div>
+        </button>
+        <button class="opt multi" onclick="toggleOpt(this,'opts-ai-purpose');syncNext('opts-ai-purpose','next6')">
+          <span class="opt-icon">🎨</span>
+          <div class="opt-text"><strong>Генерация картинок</strong><span>Midjourney, DALL-E и др.</span></div>
+        </button>
+        <button class="opt multi" onclick="toggleOpt(this,'opts-ai-purpose');syncNext('opts-ai-purpose','next6')">
+          <span class="opt-icon">💬</span>
+          <div class="opt-text"><strong>Просто поговорить / спросить</strong><span>Как умный поисковик</span></div>
+        </button>
+        <button class="opt multi" onclick="toggleOpt(this,'opts-ai-purpose');syncNext('opts-ai-purpose','next6')">
+          <span class="opt-icon">🤷</span>
+          <div class="opt-text"><strong>Пока не знает / не думал</strong></div>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(6)">← Назад</button>
+        <button class="btn-next" id="next6" onclick="goNext(6)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- ───────────────────────────────────
+         БЛОК 3 — АНГЛИЙСКИЙ ЯЗЫК (слайды 7–28)
+    ─────────────────────────────────── -->
+
+    <!-- Слайд 7: Вы учили английский раньше? -->
+    <div class="quiz-slide" id="slide-7">
+      <div class="quiz-q-num">Английский язык · 1 из 22</div>
+      <div class="quiz-q">Вы учили английский раньше?</div>
+      <div class="options-grid" id="opts-eng-1">
+        <button class="opt" onclick="selectOpt(this,'opts-eng-1');autoNext(7)">
+          <div class="opt-text"><strong>Да</strong></div>
+        </button>
+        <button class="opt" onclick="selectOpt(this,'opts-eng-1');autoNext(7)">
+          <div class="opt-text"><strong>Нет</strong></div>
+        </button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(7)">← Назад</button>
+        <button class="btn-next" id="next7" onclick="goNext(7)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 8: Choose the correct word -->
+    <div class="quiz-slide" id="slide-8">
+      <div class="quiz-q-num">Английский язык · 2 из 22</div>
+      <div class="quiz-q">Choose the correct word to complete the sentence:</div>
+      <div class="quiz-q-sub">«This is my ___»</div>
+      <div class="options-grid eng-grid" id="opts-eng-2">
+        <button class="opt" onclick="answerEng(this, 8, false)"><div class="opt-text"><strong>run</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 8, true)"><div class="opt-text"><strong>family</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 8, false)"><div class="opt-text"><strong>happy</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 8, false)"><div class="opt-text"><strong>they</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-8"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(8)">← Назад</button>
+        <button class="btn-next" id="next8" onclick="goNext(8)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 9: What is it? (футболка) -->
+    <div class="quiz-slide" id="slide-9">
+      <div class="quiz-q-num">Английский язык · 3 из 22</div>
+      <div class="quiz-q">What is it?</div>
+      <div class="eng-img-placeholder"><img src="./img/tshirt.png" alt="" height="300px"></div>
+      <div class="options-grid eng-grid" id="opts-eng-3">
+        <button class="opt" onclick="answerEng(this, 9, false)"><div class="opt-text"><strong>Tree</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 9, true)"><div class="opt-text"><strong>T-shirt</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 9, false)"><div class="opt-text"><strong>Dress</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 9, false)"><div class="opt-text"><strong>Dog</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-9"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(9)">← Назад</button>
+        <button class="btn-next" id="next9" onclick="goNext(9)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 10: Elephant is ____ -->
+    <div class="quiz-slide" id="slide-10">
+      <div class="quiz-q-num">Английский язык · 4 из 22</div>
+      <div class="quiz-q">Дополни предложение: Elephant is ____</div>
+      <div class="options-grid eng-grid" id="opts-eng-4">
+        <button class="opt" onclick="answerEng(this, 10, false)"><div class="opt-text"><strong>Small</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 10, false)"><div class="opt-text"><strong>Table</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 10, true)"><div class="opt-text"><strong>Big</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 10, false)"><div class="opt-text"><strong>Orange</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-10"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(10)">← Назад</button>
+        <button class="btn-next" id="next10" onclick="goNext(10)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 11: What is it? (яблоко) -->
+    <div class="quiz-slide" id="slide-11">
+      <div class="quiz-q-num">Английский язык · 5 из 22</div>
+      <div class="quiz-q">What is it?</div>
+      <div class="eng-img-placeholder"><img src="./img/apple.png" alt="" height="300px"></div>
+      <div class="options-grid eng-grid" id="opts-eng-5">
+        <button class="opt" onclick="answerEng(this, 11, false)"><div class="opt-text"><strong>table</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 11, false)"><div class="opt-text"><strong>banana</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 11, true)"><div class="opt-text"><strong>apple</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 11, false)"><div class="opt-text"><strong>good</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-11"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(11)">← Назад</button>
+        <button class="btn-next" id="next11" onclick="goNext(11)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 12: How old are you? -->
+    <div class="quiz-slide" id="slide-12">
+      <div class="quiz-q-num">Английский язык · 6 из 22</div>
+      <div class="quiz-q">How old are you?</div>
+      <div class="quiz-q-sub">Выбери правильный ответ</div>
+      <div class="options-grid eng-grid" id="opts-eng-6">
+        <button class="opt" onclick="answerEng(this, 12, false)"><div class="opt-text"><strong>I am a student</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 12, false)"><div class="opt-text"><strong>No, I don't</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 12, false)"><div class="opt-text"><strong>Yes, I can</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 12, true)"><div class="opt-text"><strong>I'm 7 years old</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-12"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(12)">← Назад</button>
+        <button class="btn-next" id="next12" onclick="goNext(12)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 13: What is your favourite animal? (устно) -->
+    <div class="quiz-slide" id="slide-13">
+      <div class="quiz-q-num">Английский язык · 7 из 22</div>
+      <div class="quiz-q">Ответь на вопрос: What is your favourite animal?</div>
+      <div class="quiz-q-sub">Устный ответ — нажмите запись и говорите</div>
+      <div class="audio-block">
+        <button class="btn-record" id="btn-record-13" onclick="startRecording(13)">
+          <span class="rec-icon">🎙️</span> Начать запись
+        </button>
+        <div class="rec-status" id="rec-status-13"></div>
+        <div class="rec-waveform" id="rec-waveform-13">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+        <div class="oral-feedback" id="oral-feedback-13"></div>
+      </div>
+      <input type="hidden" id="eng-oral-1" />
+      <div style="text-align:center;margin-bottom:8px;">
+        <button class="btn-skip-audio" onclick="skipAudio(13, 'eng-oral-1')">🚫 Не могу записать аудио</button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(13)">← Назад</button>
+        <button class="btn-next" id="next13" onclick="goNext(13)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 14: Where are you from? (устно) -->
+    <div class="quiz-slide" id="slide-14">
+      <div class="quiz-q-num">Английский язык · 8 из 22</div>
+      <div class="quiz-q">Ответь на вопрос: Where are you from?</div>
+      <div class="quiz-q-sub">Устный ответ — нажмите запись и говорите</div>
+      <div class="audio-block">
+        <button class="btn-record" id="btn-record-14" onclick="startRecording(14)">
+          <span class="rec-icon">🎙️</span> Начать запись
+        </button>
+        <div class="rec-status" id="rec-status-14"></div>
+        <div class="rec-waveform" id="rec-waveform-14">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+        <div class="oral-feedback" id="oral-feedback-14"></div>
+      </div>
+      <input type="hidden" id="eng-oral-2" />
+      <div style="text-align:center;margin-bottom:8px;">
+        <button class="btn-skip-audio" onclick="skipAudio(14, 'eng-oral-2')">🚫 Не могу записать аудио</button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(14)">← Назад</button>
+        <button class="btn-next" id="next14" onclick="goNext(14)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 15: How are you? (устно) -->
+    <div class="quiz-slide" id="slide-15">
+      <div class="quiz-q-num">Английский язык · 9 из 22</div>
+      <div class="quiz-q">How are you?</div>
+      <div class="quiz-q-sub">Устный ответ — нажмите запись и говорите</div>
+      <div class="audio-block">
+        <button class="btn-record" id="btn-record-15" onclick="startRecording(15)">
+          <span class="rec-icon">🎙️</span> Начать запись
+        </button>
+        <div class="rec-status" id="rec-status-15"></div>
+        <div class="rec-waveform" id="rec-waveform-15">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+        <div class="oral-feedback" id="oral-feedback-15"></div>
+      </div>
+      <input type="hidden" id="eng-oral-3" />
+      <div style="text-align:center;margin-bottom:8px;">
+        <button class="btn-skip-audio" onclick="skipAudio(15, 'eng-oral-3')">🚫 Не могу записать аудио</button>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(15)">← Назад</button>
+        <button class="btn-next" id="next15" onclick="goNext(15)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 16: She has got a dog -->
+    <div class="quiz-slide" id="slide-16">
+      <div class="quiz-q-num">Английский язык · 10 из 22</div>
+      <div class="quiz-q">Выберите правильный вариант</div>
+      <div class="options-grid eng-grid" id="opts-eng-10">
+        <button class="opt" onclick="answerEng(this, 16, false)"><div class="opt-text"><strong>She have got a dog</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 16, false)"><div class="opt-text"><strong>She does got a dog</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 16, false)"><div class="opt-text"><strong>She will got a dog</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 16, true)"><div class="opt-text"><strong>She has got a dog</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-16"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(16)">← Назад</button>
+        <button class="btn-next" id="next16" onclick="goNext(16)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 17: She goes to school -->
+    <div class="quiz-slide" id="slide-17">
+      <div class="quiz-q-num">Английский язык · 11 из 22</div>
+      <div class="quiz-q">Дополни предложение: She _____ to school every day</div>
+      <div class="options-grid eng-grid" id="opts-eng-11">
+        <button class="opt" onclick="answerEng(this, 17, true)"><div class="opt-text"><strong>goes</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 17, false)"><div class="opt-text"><strong>table</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 17, false)"><div class="opt-text"><strong>fly</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 17, false)"><div class="opt-text"><strong>going</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-17"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(17)">← Назад</button>
+        <button class="btn-next" id="next17" onclick="goNext(17)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 18: I can ride a bike -->
+    <div class="quiz-slide" id="slide-18">
+      <div class="quiz-q-num">Английский язык · 12 из 22</div>
+      <div class="quiz-q">Выбери правильный вариант</div>
+      <div class="options-grid eng-grid" id="opts-eng-12">
+        <button class="opt" onclick="answerEng(this, 18, false)"><div class="opt-text"><strong>I can bike a ride</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 18, false)"><div class="opt-text"><strong>Can ride I bike a</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 18, false)"><div class="opt-text"><strong>I ride can a bike</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 18, true)"><div class="opt-text"><strong>I can ride a bike</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-18"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(18)">← Назад</button>
+        <button class="btn-next" id="next18" onclick="goNext(18)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 19: They are smart -->
+    <div class="quiz-slide" id="slide-19">
+      <div class="quiz-q-num">Английский язык · 13 из 22</div>
+      <div class="quiz-q">Дополните предложение: They ___ smart</div>
+      <div class="options-grid eng-grid" id="opts-eng-13">
+        <button class="opt" onclick="answerEng(this, 19, false)"><div class="opt-text"><strong>is</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 19, true)"><div class="opt-text"><strong>are</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 19, false)"><div class="opt-text"><strong>will</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 19, false)"><div class="opt-text"><strong>does</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-19"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(19)">← Назад</button>
+        <button class="btn-next" id="next19" onclick="goNext(19)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 20: My brother is reading now -->
+    <div class="quiz-slide" id="slide-20">
+      <div class="quiz-q-num">Английский язык · 14 из 22</div>
+      <div class="quiz-q">Дополните предложение: My brother is ____ now</div>
+      <div class="options-grid eng-grid" id="opts-eng-14">
+        <button class="opt" onclick="answerEng(this, 20, false)"><div class="opt-text"><strong>read</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 20, true)"><div class="opt-text"><strong>reading</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 20, false)"><div class="opt-text"><strong>reads</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 20, false)"><div class="opt-text"><strong>to read</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-20"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(20)">← Назад</button>
+        <button class="btn-next" id="next20" onclick="goNext(20)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 21: I was at home -->
+    <div class="quiz-slide" id="slide-21">
+      <div class="quiz-q-num">Английский язык · 15 из 22</div>
+      <div class="quiz-q">Выберите правильный порядок слов</div>
+      <div class="options-grid eng-grid" id="opts-eng-15">
+        <button class="opt" onclick="answerEng(this, 21, false)"><div class="opt-text"><strong>I at home was</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 21, true)"><div class="opt-text"><strong>I was at home</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 21, false)"><div class="opt-text"><strong>I were at home</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 21, false)"><div class="opt-text"><strong>I home at were</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-21"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(21)">← Назад</button>
+        <button class="btn-next" id="next21" onclick="goNext(21)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 22: Видео -->
+    <div class="quiz-slide" id="slide-22">
+      <div class="quiz-q-num">Английский язык · 16 из 22</div>
+      <div class="quiz-q">Посмотрите видео и ответьте на вопросы</div>
+      <div class="eng-video-wrap">
+        <iframe
+          src="https://www.youtube.com/embed/yHIpT0KzQ0I"
+          title="English video"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(22)">← Назад</button>
+        <button class="btn-next" onclick="goNext(22)">Я посмотрел →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 23: What's the girl's name? -->
+    <div class="quiz-slide" id="slide-23">
+      <div class="quiz-q-num">Английский язык · 17 из 22</div>
+      <div class="quiz-q">What's the girl's name?</div>
+      <div class="options-grid eng-grid" id="opts-eng-17">
+        <button class="opt" onclick="answerEng(this, 23, false)"><div class="opt-text"><strong>Tom</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 23, true)"><div class="opt-text"><strong>Rosy</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 23, false)"><div class="opt-text"><strong>Suzy</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 23, false)"><div class="opt-text"><strong>Billy</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-23"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(23)">← Назад</button>
+        <button class="btn-next" id="next23" onclick="goNext(23)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 24: What colour are Tim's eyes? -->
+    <div class="quiz-slide" id="slide-24">
+      <div class="quiz-q-num">Английский язык · 18 из 22</div>
+      <div class="quiz-q">What colour are Tim's eyes?</div>
+      <div class="options-grid eng-grid" id="opts-eng-18">
+        <button class="opt" onclick="answerEng(this, 24, true)"><div class="opt-text"><strong>Green</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 24, false)"><div class="opt-text"><strong>Two</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 24, false)"><div class="opt-text"><strong>Brown</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 24, false)"><div class="opt-text"><strong>Nose</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-24"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(24)">← Назад</button>
+        <button class="btn-next" id="next24" onclick="goNext(24)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 25: How old is Billy? -->
+    <div class="quiz-slide" id="slide-25">
+      <div class="quiz-q-num">Английский язык · 19 из 22</div>
+      <div class="quiz-q">How old is Billy?</div>
+      <div class="options-grid eng-grid" id="opts-eng-19">
+        <button class="opt" onclick="answerEng(this, 25, false)"><div class="opt-text"><strong>Five</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 25, false)"><div class="opt-text"><strong>Brother</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 25, true)"><div class="opt-text"><strong>Two</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 25, false)"><div class="opt-text"><strong>Sister</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-25"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(25)">← Назад</button>
+        <button class="btn-next" id="next25" onclick="goNext(25)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 26: Where do Anna and her dog play? -->
+    <div class="quiz-slide" id="slide-26">
+      <div class="quiz-q-num">Английский язык · 20 из 22</div>
+      <div class="eng-reading-text">
+        Anna goes to the park with her little dog. They like to play together.
+        Anna throws a red ball, and her dog runs fast to catch it.
+        They laugh and have fun in the sun.
+      </div>
+      <div class="quiz-q">Where do Anna and her dog play?</div>
+      <div class="options-grid eng-grid" id="opts-eng-20">
+        <button class="opt" onclick="answerEng(this, 26, false)"><div class="opt-text"><strong>At home</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 26, false)"><div class="opt-text"><strong>In a shop</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 26, true)"><div class="opt-text"><strong>In the park</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 26, false)"><div class="opt-text"><strong>At school</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-26"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(26)">← Назад</button>
+        <button class="btn-next" id="next26" onclick="goNext(26)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 27: Anna has got a ___ -->
+    <div class="quiz-slide" id="slide-27">
+      <div class="quiz-q-num">Английский язык · 21 из 22</div>
+      <div class="eng-reading-text">
+        Anna goes to the park with her little dog. They like to play together.
+        Anna throws a red ball, and her dog runs fast to catch it.
+        They laugh and have fun in the sun.
+      </div>
+      <div class="quiz-q">Выберите правильный вариант: Anna has got a _____</div>
+      <div class="options-grid eng-grid" id="opts-eng-21">
+        <button class="opt" onclick="answerEng(this, 27, false)"><div class="opt-text"><strong>Cat</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 27, false)"><div class="opt-text"><strong>Cow</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 27, true)"><div class="opt-text"><strong>Dog</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 27, false)"><div class="opt-text"><strong>Apple</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-27"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(27)">← Назад</button>
+        <button class="btn-next" id="next27" onclick="goNext(27)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- Слайд 28: What does Anna's dog like to do? -->
+    <div class="quiz-slide" id="slide-28">
+      <div class="quiz-q-num">Английский язык · 22 из 22</div>
+      <div class="eng-reading-text">
+        Anna goes to the park with her little dog. They like to play together.
+        Anna throws a red ball, and her dog runs fast to catch it.
+        They laugh and have fun in the sun.
+      </div>
+      <div class="quiz-q">What does Anna's dog like to do?</div>
+      <div class="options-grid eng-grid" id="opts-eng-22">
+        <button class="opt" onclick="answerEng(this, 28, true)"><div class="opt-text"><strong>Run and catch a ball</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 28, false)"><div class="opt-text"><strong>Read a book</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 28, false)"><div class="opt-text"><strong>Watch TV</strong></div></button>
+        <button class="opt" onclick="answerEng(this, 28, false)"><div class="opt-text"><strong>Go shopping</strong></div></button>
+      </div>
+      <div class="eng-feedback" id="eng-note-28"></div>
+      <div class="nav-row">
+        <button class="btn-back" onclick="goBack(28)">← Назад</button>
+        <button class="btn-next" id="next28" onclick="goNext(28)" disabled>Далее →</button>
+      </div>
+    </div>
+
+    <!-- ───────────────────────────────────
+         БЛОК 4 — КОНТАКТ (слайд 29)
+    ─────────────────────────────────── -->
+
+    <div class="quiz-slide" id="slide-29">
+      <div class="quiz-q-num">Последний шаг</div>
+      <div class="quiz-q">Куда отправить результаты диагностики?</div>
+      <div class="quiz-q-sub">Пришлём PDF с уровнем английского и ИИ-диагностикой в течение минуты</div>
+      <input class="input-field" id="parentName" type="text" placeholder="Ваше имя (родитель)"
+        oninput="checkContact()" />
+      <input class="input-field" id="parentEmail" type="email" placeholder="Email адрес"
+        oninput="checkContact()" />
+      <input class="input-field" id="notes" type="text" placeholder="Дополнительные пожелания (необязательно)" />
+      <div class="error-msg" id="errorMsg">Пожалуйста, заполните имя и email</div>
+      <div class="nav-row" style="margin-top:8px;">
+        <button class="btn-back" onclick="goBack(29)">← Назад</button>
+        <button class="btn-next" id="nextSubmit" onclick="submitQuiz()" disabled>Получить результаты →</button>
+      </div>
+    </div>
+
+  </div><!-- /quiz-body -->
+</div><!-- /quiz-wrap -->
+
+<div class="sending-screen" id="sendingScreen">
+  <div class="sending-ring"></div>
+  <h2>Формируем диагностику...</h2>
+  <p>Анализируем ответы и готовим<br>персональный отчёт для вашего ребёнка</p>
+</div>
+
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✓</div>
+  <h2>Результаты отправлены!</h2>
+  <p>Диагностика уже летит на <strong id="successEmail"></strong>.<br>Проверьте почту — обычно приходит за 1–2 минуты.</p>
+  <button class="btn-restart" onclick="restart()">← Пройти ещё раз</button>
+</div>
+
+<script src="quiz.js"></script>
+</body>
+</html>
